@@ -46,7 +46,7 @@ public class DistributedClientCredentialsTokenCache : IClientCredentialsTokenCac
         ArgumentNullException.ThrowIfNull(clientName);
             
         var cacheExpiration = clientCredentialsToken.Expiration.AddSeconds(-_options.CacheLifetimeBuffer);
-        var data = JsonSerializer.Serialize(clientCredentialsToken);
+        var data = JsonSerializer.Serialize(clientCredentialsToken, ClientCredentialsTokenContext.Default.ClientCredentialsToken);
 
         var entryOptions = new DistributedCacheEntryOptions
         {
@@ -75,7 +75,7 @@ public class DistributedClientCredentialsTokenCache : IClientCredentialsTokenCac
             try
             {
                 _logger.LogDebug("Cache hit for access token for client: {clientName}", clientName);
-                return JsonSerializer.Deserialize<ClientCredentialsToken>(entry);
+                return JsonSerializer.Deserialize(entry, ClientCredentialsTokenContext.Default.ClientCredentialsToken);
             }
             catch (Exception ex)
             {
